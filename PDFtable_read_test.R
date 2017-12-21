@@ -1,0 +1,15 @@
+library(pdftools)
+txt <- pdf_text("237619.pdf")
+N2O <- cat(txt[118])
+cat(txt[116])
+
+library(pdftools)
+txt <- pdf_text("liv47310.pdf")
+# N2O <- cat(txt[118])
+cat(txt[43])
+a <- paste(txt[43])
+write.table(paste(txt[43]), "clipboard", sep="\t", row.names = FALSE, col.names = TRUE)
+# 
+# library(pdftables)
+# write.csv(head(iris), file = "temp.csv", row.names = FALSE)
+# convert_pdf("Agri emissions - Pages from 237619.pdf", "temp.csv")

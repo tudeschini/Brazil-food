@@ -45,3 +45,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.pdf
+BRA0_cookfuel.xlsx
+*Rproj*
+
+
+*.bak
+*.csv
+.RData
+*.Rhistory
