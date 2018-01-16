@@ -175,7 +175,7 @@ a <- food %>% left_join(sum_nutri %>% select(code7, DESCRIÇÃO.DO.ALIMENTO, ENE
 a <- a %>% filter(item=="Baked Products" | item=="Dairy" | item=="Cereals and legumes" | grepl("meat", item, ignore.case=TRUE) | 
                     grepl("vegetables", item, ignore.case=TRUE) | grepl("fish", item, ignore.case=TRUE) | item=="Poultry and eggs" | 
                     item=="Flour, starch and pasta" | grepl("nuts", item, ignore.case=TRUE) | grepl("fruit", item, ignore.case=TRUE) )
-exp <- a %>% group_by(item) %>% summarize(val_tot=sum(value), qty_tot=sum(kg)) %>% 
+exp <- a %>% group_by(item) %>% summarise(val_tot=sum(value), qty_tot=sum(kg)) %>% 
   mutate(share=val_tot/sum(val_tot)) %>% filter(val_tot>0 | is.na(val_tot))
 a %>% group_by(item3, no_nutri) %>% summarise(sum(value))
 a %>% group_by(no_nutri) %>% summarise(sum(value*weight))  
@@ -240,7 +240,7 @@ cons = d %>%
   merge(ce_code) %>% 
   filter(main=="Food and beverage") %>%  # Will drop any codes in 'd' not found in 'ce_code'
   group_by(id,item) %>%
-  summarize(eatout_tot=sum(value), qty_tot=sum(qty)) %>%  # Sum and annualize values
+  summarise(eatout_tot=sum(value), qty_tot=sum(qty)) %>%  # Sum and annualize values
   filter(eatout_tot>0 | is.na(eatout_tot))
 
 

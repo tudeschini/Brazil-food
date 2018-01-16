@@ -1,3 +1,6 @@
+# This is run from POF_data_read_in.R
+
+
 ### Function to find out where each POF code belongs to
 get.idx <- function(y) {
   idx <- which(sapply(POF.mapping, function(x) {y %in% x}))

@@ -39,7 +39,8 @@ require(xlsx)
 
 
 ### POF data is not in DLE DB. Instead, it is under the survey drive as raw files.
-setwd("P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/")
+# setwd("P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/")
+setwd("H:/MyDocuments/Analysis/Food/Brazil")
 path_POF <- "P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/Data/"
 source("POF_data_read_in.R")
 

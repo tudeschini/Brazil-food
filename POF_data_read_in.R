@@ -25,10 +25,10 @@ char2num = function(d) {
 }
 
 # Excel file linking survey's item codes to item names
-ce_code = read_excel("Documentation/BRA POF 2008-2009 CE Codes.xlsx") %>% data.table(key="code") %>%
+ce_code = read_excel("P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/Documentation/BRA POF 2008-2009 CE Codes.xlsx") %>% data.table(key="code") %>%
   mutate(code7=as.numeric(code)) %>% filter(main=="Food and beverage")
 # Excel file linking state numeric codes to state name
-geo_code = read_excel("Documentation/BRA POF 2008-2009 Geographic Codes.xlsx")
+geo_code = read_excel("P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/Documentation/BRA POF 2008-2009 Geographic Codes.xlsx")
 
 # File path to .RData object containing monthly PPP adustment factors for desired base year
 # Extract uniform PPP adjustment factor to apply to all values
@@ -152,7 +152,7 @@ food = char2num(t_caderneta_despesa_s) %>%
   mutate_cond(kg==0, kg=NA) %>%   # This ensures that NA is returned for item where quantities are not possible
   select(id:value, -period) %>% 
   group_by(id, code7) %>%  
-  summarize(val_tot=sum(value), qty_tot=sum(kg)) %>%  # Sum values by household and item
+  summarise(val_tot=sum(value), qty_tot=sum(kg)) %>%  # Sum values by household and item
   filter(val_tot>0 | is.na(val_tot)) %>%
   left_join(taco %>% select(-preparation, -code5), by="code7") %>%
   mutate(code5=floor(code7/100)) 
@@ -180,7 +180,7 @@ cons = char2num(t_despesa_individual_s) %>%
   mutate(period=365/fator_anual) %>%
   mutate(value=val_despesa_corrigido*ppp_fact*365/period) %>%  # Inflation-adjusted value (Jan 2009) converted to $PPP in specified base year
   group_by(id, code7) %>%
-  summarize(val_tot=sum(value)) %>%  # Sum and annualize values
+  summarise(val_tot=sum(value)) %>%  # Sum and annualize values
   filter(val_tot>0 | is.na(val_tot)) %>%
   mutate(eatout=1) %>%  # All items here are outside consumption
   data.table(key="code7") %>%

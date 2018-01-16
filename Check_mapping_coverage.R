@@ -6,11 +6,34 @@
 
 
 ### 0. Link the nutri info both from TACO (code7) + Claudia (code5) and see the coverage (Most up-to-date) on 21/12/2017
+# 0.1 Only the 'food' items (non-eatout food) => 1094 kcal/day
 food.master %>% mutate(covered = !is.na(kcal)) %>% group_by(covered) %>% 
   summarise(val.tot=sum(val_tot*weight, na.rm=TRUE), val.share=sum(val_tot*weight)/sum(food.master$val_tot*food.master$weight), 
             kcal.tot=sum(qty_tot*weight*kcal*10, na.rm=TRUE), 
             kcal.pcap.day=sum(qty_tot*weight*kcal*10, na.rm=TRUE)/sum(hh$hh_size*hh$weight)/365)
 
+# 0.2 Incorporate kcal of eat-out food (by simple scaling of kcal/$)  => 1986 kcal/day
+a <- food.master %>% mutate(covered = !is.na(kcal)) %>% 
+  filter(covered) %>% group_by(id) %>% summarise(val_tot=sum(val_tot), kcal_tot=sum(kcal*qty_tot*10)) %>% mutate(cal_p=kcal_tot/val_tot)
+
+aa <- a %>% left_join(data.table(hh, key="id"), by="id") %>%
+  mutate(kcal.pcap.day=kcal_tot/hh_size/365) %>% select(id, kcal_tot, weight, hh_size, kcal.pcap.day, income) 
+hist(aa$kcal.pcap.day, 1000, xlim=c(0, 5000))
+
+b <- food.master %>%  
+  filter(eatout==1) %>% group_by(id) %>% summarise(val_tot=sum(val_tot), kcal_tot=sum(kcal*qty_tot*10)) %>% 
+  left_join(a %>% select(id, cal_p)) %>% mutate(kcal_tot=val_tot*cal_p)
+
+c <- bind_rows(a, b) %>% arrange(id) %>% left_join(data.table(hh, key="id"), by="id") %>% group_by(id) %>%
+  summarise(kcal_tot=sum(kcal_tot), weight=first(weight), hh_size=first(hh_size), income=first(income)) %>%  
+  mutate(kcal.pcap.day=kcal_tot/hh_size/365) %>% select(id, kcal_tot, weight, hh_size, kcal.pcap.day, income) 
+sum(c$kcal.pcap.day*c$weight, na.rm=TRUE)/sum(c$weight, na.rm=TRUE)
+hist(c$kcal.pcap.day, 1000, xlim=c(0, 5000))
+
+# food expenditure by hh
+a <- food.master %>% group_by(id) %>%
+  summarise(val_tot=sum(val_tot), hh_size=first(hh_size), val_pcap= sum(val_tot)/first(hh_size))
+hist(a$val_pcap, 1000, xlim=c(0, 6000))
 
 
 ### 1. Link the nutri info from Claudia and see the coverage 
@@ -48,7 +71,7 @@ a <- food %>% left_join(sum_nutri %>% select(code7, DESCRIÇÃO.DO.ALIMENTO, ENE
 a <- a %>% filter(item=="Baked Products" | item=="Dairy" | item=="Cereals and legumes" | grepl("meat", item, ignore.case=TRUE) | 
                     grepl("vegetables", item, ignore.case=TRUE) | grepl("fish", item, ignore.case=TRUE) | item=="Poultry and eggs" | 
                     item=="Flour, starch and pasta" | grepl("nuts", item, ignore.case=TRUE) | grepl("fruit", item, ignore.case=TRUE) )
-exp <- a %>% group_by(item) %>% summarize(val_tot=sum(value), qty_tot=sum(kg)) %>% 
+exp <- a %>% group_by(item) %>% summarise(val_tot=sum(value), qty_tot=sum(kg)) %>% 
   mutate(share=val_tot/sum(val_tot)) %>% filter(val_tot>0 | is.na(val_tot))
 a %>% group_by(item3, no_nutri) %>% summarise(sum(value))
 a %>% group_by(no_nutri) %>% summarise(sum(value*weight))  
