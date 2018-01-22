@@ -27,9 +27,9 @@ geo_code = read_excel("Documentation/BRA POF 2008-2009 Geographic Codes.xlsx")
 ppp_path = "P:/ene.general/DecentLivingEnergy/Surveys/Consumer Prices/Monthly PPP adjustment factors for base year 2010.RData"
 ppp_fact = filter(readRDS(ppp_path), iso3=="BRA", year==2009, month==1)$ppp_fact
 
-nutri <- read_xls("H:/MyDocuments/Data/Food-BRA/Tables of Nutritional Composition of Food.xls", skip=3, n_max=1971) %>% 
+nutri <- read_xls(paste0(datadir, "Tables of Nutritional Composition of Food - IBGE liv50002.xls"), skip=3, n_max=1971) %>% 
   rename(code7=`CÓDIGO DO ALIMENTO`) %>% mutate(code5 = floor(code7/100))
-IBGE_map <- read_xls("H:/MyDocuments/Data/Food-BRA/POF_2008-2009_Codigos_de_alimentacao.xls", skip=2, n_max=2339) 
+IBGE_map <- read_xls(paste0(datadir, "POF_2008-2009_Codigos_de_alimentacao - POF.xls"), skip=2, n_max=2339) 
 names(IBGE_map) <- c("code5", "level1", "item1", "level2", "item2", "level3", "item3")
 IBGE_map <- IBGE_map %>% #rename(code5=Código)
   mutate_cond(is.na(item3), item3=item2, level3=level2)

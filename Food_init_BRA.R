@@ -7,7 +7,8 @@ source("P:/ene.general/DecentLivingEnergy/Surveys/Generic function to access dat
 
 # Working directory is set by .Rprofile when loading this project
 workdir <- paste0(getwd(), '/')
-datadir <- "../../../Data/Food-BRA/"
+# datadir <- "../../../Data/Food-BRA/"
+datadir <- "C:/Users/min/IIASA/DLE - Documents/WS2 - Documents/Data/Food/Brazil/Mapping collaboration/"
 # gamsdir <- "../diet_gms/"
 
 # Keep .gms file from other temporary intermediate files (.gdx and .log) for the sake of OneDrive (trying to synch all the files..)
@@ -43,6 +44,21 @@ require(xlsx)
 setwd("H:/MyDocuments/Analysis/Food/Brazil")
 path_POF <- "P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/Data/"
 source("POF_data_read_in.R")
+
+
+
+
+
+
+
+
+
+
+### After this point, it is placeholder (originally from India analysis)
+### Don't run for now (22/Jan/2018)
+
+
+
 
 
 ### Indian Dietary Reference Intakes (DRI)

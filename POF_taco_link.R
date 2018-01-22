@@ -11,7 +11,7 @@ get.idx <- function(y) {
 
 ### 1. Read in Claudia's mapping
 # Nutrition info is based on "Taco_4a_edicao_2011 - TACO.xls" (2011)
-POF.nutri <- read_xlsx("C:/Users/min/IIASA/DLE - Documents/WS2 - Documents/Data/Food/Brazil/Mapping collaboration/171023 Nutricional values food POF2008-9 - Claudia.xlsx", 
+POF.nutri <- read_xlsx(paste0(datadir,"171023 Nutricional values food POF2008-9 - Claudia.xlsx"), 
                        range = "A4:J109", 
                        col_types=c("text", "text", "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")) 
 names(POF.nutri) <- c("item.prt", "item.eng", "POF.num", "cons.percap", "kcal", "protein", "iron", "zinc", "vita", "taco.num")
@@ -35,7 +35,7 @@ POF.nutri.p <- data.frame(code7 = POF.covered, code5 = POF.covered5, item.num=sa
 
 
 ### 2. TACO (2008-2009) based on liv5002.pdf
-taco.raw <- read_xls("H:/MyDocuments/Data/Food-BRA/Tables of Nutritional Composition of Food.xls", skip=3, n_max=1971) 
+taco.raw <- read_xls(paste0(datadir, "Tables of Nutritional Composition of Food - IBGE liv50002.xls"), skip=3, n_max=1971) 
 taco <- taco.raw %>% select(1:3, 7:10, 16, 21, 23:24) 
 names(taco) <- c("code7", "item", "preparation", "kcal", "protein", "fat", "carb", "iron", "zinc", "retinol", "retinol.eq")
 taco <- taco %>% mutate(code5 = floor(code7/100)) %>% 
