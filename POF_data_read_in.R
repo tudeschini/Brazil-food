@@ -129,8 +129,7 @@ pp = pp %>%
 #--------------------------
 
 ### Combine household level variables
-hh = Reduce(function(...) left_join(...), list(d1,pp))
-
+hh = Reduce(function(...) left_join(...), list(d1,pp)) 
 #--------------------------
 #--------------------------
 
@@ -174,6 +173,7 @@ food.tbl <- food %>% filter(!is.na(kcal)) %>% select(id, code7, code5, item, val
 ### Combining eatout or prepared food from 'other consumption' (from POF "individual" table)
 # This is covering the whole hh of POF.
 # Food items here are anything consumed outside home.
+# No mapping exists for these items.
 cons = char2num(t_despesa_individual_s) %>%
   mutate(id=as.character(cod_uf*1e6 + num_seq*1e3 + num_dv*100 + cod_domc)) %>%
   mutate(code7=as.numeric(paste0(str_pad(num_quadro,width=2,pad=0), str_pad(cod_item,width=5,pad=0)))) %>%
@@ -187,12 +187,32 @@ cons = char2num(t_despesa_individual_s) %>%
   inner_join(ce_code %>% mutate(code7=as.numeric(code)), by="code7") %>%  # Keep only food items
   select(id, code7, item=product, val_tot, eatout)
 
+
+
 # Master data table for food analysis
+# kcal:vita are nutrient/100g food.
 food.master <- food.tbl %>% rbind.fill(cons) %>% data.table(key=c("id", "code7")) %>% 
   mutate(code5=floor(code7/100)) %>% group_by(id) %>%
-  mutate(eatout.share = sum(eatout*val_tot) / sum(val_tot)) %>%
-  left_join(data.table(hh, key="id"), by="id")# %>% select(id, code7, item, val_tot, qty_tot, eatout, kcal:vita, everything())
+  mutate(eatout.share = sum(eatout*val_tot) / sum(val_tot),
+         mapped = ifelse(is.na(kcal), 0, 1)) %>%
+  left_join(data.table(hh, key="id"), by="id") %>% data.frame() # %>% select(id, code7, item, val_tot, qty_tot, eatout, kcal:vita, everything())
 
+
+
+### Income conversion to $2010PPP and create income groups
+
+library(WDI)
+PPP <- WDI(country = "BR", indicator = c("PA.NUS.PRVT.PP"), start = 2010, end = 2010, extra = FALSE, cache = NULL)  #[LCU/$]
+CPI <- WDI(country = "BR", indicator = "FP.CPI.TOTL", start = 2008, end = 2010, extra = FALSE, cache = NULL)
+CPI.r <- as.numeric(CPI %>% filter(year==2010) %>% select(FP.CPI.TOTL) / CPI %>% filter(year==2008) %>% select(FP.CPI.TOTL))
+# EXR <- WDI(country = "BR", indicator = "PA.NUS.FCRF", start = 2008, end = 2008, extra = FALSE, cache = NULL) # Exchange rate (MER) [LCU/$]
+ 
+hh <- hh %>% mutate(income = income * CPI.r / PPP$PA.NUS.PRVT.PP) %>%
+  mutate(inc.percap = income/hh_size) %>%
+  mutate(inc_grp=as.integer(cut(inc.percap,breaks=c(0, 1.4*365, 2.8*365, 5.6*365, max(inc.percap)*365), labels=c(1:4)))) %>% # NEED TO ADJUST!
+  mutate(female_adult=hh_size-minor-male_adult, female_minor=minor-male_minor) %>%
+  mutate(cu_eq=(male_adult*getcu("male_adult")+female_adult*getcu("female_adult")+
+                  male_minor*getcu("male_minor")+female_minor*getcu("female_minor")))
 
 
 
