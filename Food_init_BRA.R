@@ -9,6 +9,7 @@ source("P:/ene.general/DecentLivingEnergy/Surveys/Generic function to access dat
 workdir <- paste0(getwd(), '/')
 # datadir <- "../../../Data/Food-BRA/"
 datadir <- "C:/Users/min/IIASA/DLE - Documents/WS2 - Documents/Data/Food/Brazil/Mapping collaboration/"
+localdatadir <- "H:/MyDocuments/Data/Food-BRA/"
 # gamsdir <- "../diet_gms/"
 
 # Keep .gms file from other temporary intermediate files (.gdx and .log) for the sake of OneDrive (trying to synch all the files..)
@@ -39,14 +40,43 @@ require(readxl)
 require(xlsx)
 
 
+### Basic parameters
+dris <- read.csv(paste0(localdatadir, "DRI-India.csv"), header=TRUE)  # NEED TO ADJUST
+cu_eqs <- read.csv(paste0(localdatadir, "cu_eq.csv"), header=TRUE)  
+
+### Functions
+# Function to return the household-specific nutrient DRIs given composition of age and adult/minor ###
+getDRI= function(group, nutrient) {
+  x = dris %>%
+    filter(group==Group & nutrient==Nutrient) %>%
+    select(DRI)
+  return(as.numeric(x))
+}
+
+# Function that returns the cons eq of the hh member (male adult=1, fem ad=0.77, children=0.60)
+getcu= function(group) {
+  x = cu_eqs %>%
+    filter(group==Group) %>%
+    select(cu_eq)
+  return(as.numeric(x))
+}
+
+# function returns the nutritional gap per cu-eq for a given nutrient and member type, where positive indicates intake deficiency
+get_gap=function(group,nutrient,amount) {
+  
+  dri = getDRI(group, nutrient)
+  consum = getcu(group)*amount
+  x = (dri-consum)/dri
+  
+  return(x)
+}
+
+
 ### POF data is not in DLE DB. Instead, it is under the survey drive as raw files.
 # setwd("P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/")
 setwd("H:/MyDocuments/Analysis/Food/Brazil")
 path_POF <- "P:/ene.general/DecentLivingEnergy/Surveys/Brazil/POF 2008-2009/Data/"
 source("POF_data_read_in.R")
-
-
-
 
 
 
